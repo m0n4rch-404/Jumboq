@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Yurak Jumboqi</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Inter:wght@400;500&family=Caveat:wght@500;700&display=swap">
+<style>
+/* Layout: one centered card, five rounds of rising difficulty, then a handwritten letter reveal */
+:root {
+  --bg: #fdf0f3;
+  --card: #ffffff;
+  --fg: #3a1a26;
+  --muted: #8a6573;
+  --accent: #d6336c;
+  --accent-soft: #fbd3df;
+  --ok: #2f9e6b;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-hand: "Caveat", "Bradley Hand", cursive;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1d0e16; --card: #2a1520; --fg: #fbe6ee; --muted: #c49aad;
+    --accent: #ff6b9a; --accent-soft: #4a2335; --ok: #5fd39b; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1d0e16; --card: #2a1520; --fg: #fbe6ee; --muted: #c49aad;
+  --accent: #ff6b9a; --accent-soft: #4a2335; --ok: #5fd39b; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.5;
+  padding-block: 28px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  min-height: 100vh;
+}
+main { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+.dots { display: flex; gap: 8px; justify-content: center; }
+.dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--accent-soft); transition: background .3s, transform .3s; }
+.dots i.on { background: var(--accent); transform: scale(1.25); }
+.card { background: var(--card); border-radius: 20px; padding: 26px 22px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 6px 30px rgba(214, 51, 108, .12); }
+.eyebrow { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+h1, h2 { font-family: var(--font-display); line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: 34px; }
+h2 { font-size: 25px; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+.slots, .chips { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; min-width: 0; }
+.slot { min-width: 46px; height: 56px; padding: 0 8px; border-radius: 12px; border: 2px dashed var(--accent-soft); display: grid; place-items: center; font-family: var(--font-display); font-size: 24px; font-weight: 700; color: var(--accent); }
+.slot.filled { border-style: solid; border-color: var(--accent); }
+button, select, input { font: inherit; }
+button { cursor: pointer; border: 0; }
+button:focus-visible, select:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.chip { min-width: 46px; height: 52px; padding: 0 14px; border-radius: 12px; background: var(--accent-soft); color: var(--fg); font-family: var(--font-display); font-size: 22px; font-weight: 700; }
+.chip:disabled { opacity: .3; cursor: default; }
+.choice { width: 100%; text-align: left; padding: 15px 18px; border-radius: 14px; background: var(--accent-soft); color: var(--fg); font-size: 18px; font-weight: 500; }
+.choice.bad { background: transparent; box-shadow: inset 0 0 0 2px var(--muted); color: var(--muted); }
+.choice.good { background: var(--ok); color: #fff; }
+.choices { display: flex; flex-direction: column; gap: 10px; }
+.pair { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: space-between; background: var(--accent-soft); border-radius: 14px; padding: 12px 14px; }
+.pair b { font-family: var(--font-display); font-size: 20px; min-width: 0; overflow-wrap: anywhere; }
+select, input[type="text"] { background: var(--card); color: var(--fg); border: 2px solid var(--accent-soft); border-radius: 10px; padding: 10px 12px; font-size: 17px; max-width: 100%; }
+input[type="text"] { width: 100%; text-align: center; font-size: 20px; border-color: var(--accent); }
+.code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 26px; letter-spacing: .12em; text-align: center; background: var(--accent-soft); border-radius: 14px; padding: 18px 12px; overflow-wrap: anywhere; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center; }
+.link { background: none; color: var(--muted); text-decoration: underline; padding: 6px 10px; font-size: 15px; }
+a.link { color: var(--accent); }
+.primary { background: var(--accent); color: #fff; padding: 14px 26px; border-radius: 999px; font-weight: 500; font-size: 17px; }
+.hint { min-height: 24px; text-align: center; color: var(--muted); font-size: 15px; overflow-wrap: anywhere; }
+.shake { animation: shake .4s; }
+@keyframes shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+.letter { font-family: var(--font-hand); font-size: 30px; line-height: 1.3; text-align: center; display: flex; flex-direction: column; gap: 12px; }
+.letter .big { font-size: 46px; font-weight: 700; color: var(--accent); line-height: 1.1; }
+.heart { width: 84px; height: 84px; margin: 0 auto; animation: beat 1.4s ease-in-out infinite; }
+@keyframes beat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.14); } 30% { transform: scale(1); } 45% { transform: scale(1.1); } }
+.reply { font-family: var(--font-hand); font-size: 28px; color: var(--accent); text-align: center; }
+@media (prefers-reduced-motion: reduce) { .heart, .shake { animation: none; } .dots i { transition: none; } }
+</style>
+
+<main>
+  <div class="dots" id="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+  <section class="card" id="stage" aria-live="polite"></section>
+</main>
+
+<script>
+(function () {
+  var NAME = "Charos";
+  var stage = document.getElementById("stage");
+  var dots = document.querySelectorAll("#dots i");
+
+  function setDots(n) { dots.forEach(function (d, k) { d.classList.toggle("on", k <= n); }); }
+  function shake() { stage.classList.remove("shake"); void stage.offsetWidth; stage.classList.add("shake"); }
+  function norm(s) { return s.toLowerCase().replace(/[‘’ʻʼ'`]/g, "").replace(/[^a-zЀ-ӿ ]/g, "").replace(/\s+/g, " ").trim(); }
+  function q(id) { return document.getElementById(id); }
+  function search(url) { return '<a class="link" href="' + url + '" target="_blank" rel="noopener">Internetdan qidirish</a>'; }
+
+  // Common frame: eyebrow, title, extra body, hint line, and the hint buttons
+  function frame(n, label, title, sub, body, tip, url) {
+    setDots(n - 1);
+    stage.innerHTML =
+      '<p class="eyebrow">' + n + ' / 5 · ' + label + '</p>' +
+      '<h2>' + title + '</h2>' + (sub ? '<p class="muted">' + sub + '</p>' : '') + body +
+      '<div class="hint" id="hint"></div>' +
+      '<div class="row">' + (tip ? '<button class="link" id="tip">Maslahat</button>' : '') + (url ? search(url) : '') + '</div>';
+    if (tip) q("tip").onclick = function () { q("hint").textContent = tip; };
+  }
+  function good(msg, next) { q("hint").textContent = msg; setTimeout(next, 1100); }
+  function bad(msg) { q("hint").textContent = msg; shake(); }
+
+  function intro() {
+    setDots(-1);
+    stage.innerHTML =
+      '<p class="eyebrow">' + NAME + ' uchun</p>' +
+      '<h1>' + NAME + ', senga atalgan bitta sir bor.</h1>' +
+      '<p class="muted">Uni ochish uchun 5 ta jumboqni yechishing kerak. Dastlabkilari oson, oxirgisi esa o‘ylantiradi. Qiynalsang, internetdan qidirishing mumkin.</p>' +
+      '<div class="row"><button class="primary" id="go">Boshlaymiz</button></div>';
+    q("go").onclick = r1;
+  }
+
+  // Generic tile builder: tap pieces in order, joined string must equal target
+  function tiles(pieces, target, onDone, failMsg) {
+    var picked = [];
+    var slots = q("slots"), chips = q("chips");
+    function draw() {
+      slots.innerHTML = "";
+      for (var k = 0; k < target.length; k++) {
+        var s = document.createElement("div");
+        s.className = "slot" + (picked[k] ? " filled" : "");
+        s.textContent = picked[k] ? pieces[picked[k] - 1] : "";
+        slots.appendChild(s);
+      }
+      chips.innerHTML = "";
+      pieces.forEach(function (ch, idx) {
+        var b = document.createElement("button");
+        b.className = "chip"; b.textContent = ch;
+        b.disabled = picked.indexOf(idx + 1) !== -1;
+        b.onclick = function () { picked.push(idx + 1); draw(); check(); };
+        chips.appendChild(b);
+      });
+    }
+    function check() {
+      if (picked.length < pieces.length) return;
+      var w = picked.map(function (p) { return pieces[p - 1]; }).join("");
+      if (w === target) onDone(); else { bad(failMsg); picked = []; setTimeout(draw, 350); }
+    }
+    q("reset").onclick = function () { picked = []; q("hint").textContent = ""; draw(); };
+    draw();
+  }
+
+  // 1. Her name, scrambled
+  function r1() {
+    frame(1, "Harflar", "Aralashib ketgan harflardan so‘z tuz.", "Bu so‘z senga juda yaqin, 6 ta harf.",
+      '<div class="slots" id="slots"></div><div class="chips" id="chips"></div><div class="row"><button class="link" id="reset">Qaytadan</button></div>',
+      "Bu sening ismingning o‘zi.");
+    tiles(["S", "A", "R", "O", "H", "C"], "CHAROS", function () { good("To‘g‘ri, bu sening isming.", r2); }, "Deyarli, yana urinib ko‘r.");
+  }
+
+  // 2. Riddle
+  function r2() {
+    frame(2, "Topishmoq", "Berganingda ko‘payadi, ayamasang tugamaydi. Bu nima?", "",
+      '<div class="choices" id="choices"></div>',
+      "Bu narsa yaqin odamlarga beriladi, pulga sotib olinmaydi.");
+    ["Pul", "Vaqt", "Mehr", "Bilim"].forEach(function (o) {
+      var b = document.createElement("button");
+      b.className = "choice"; b.textContent = o;
+      b.onclick = function () {
+        if (o === "Mehr") { b.classList.add("good"); good("Ha, mehr. Yurakdan berilgan narsa kamaymaydi.", r3); }
+        else { b.classList.add("bad"); bad("Yo‘q, yana o‘ylab ko‘r."); }
+      };
+      q("choices").appendChild(b);
+    });
+  }
+
+  // 3. Match "I love you" phrases to languages
+  function r3() {
+    var pairs = [["Je t’aime", "Fransuz"], ["Ich liebe dich", "Nemis"], ["Я тебя люблю", "Rus"], ["Seni seviyorum", "Turk"]];
+    var langs = ["Italyan", "Rus", "Turk", "Nemis", "Fransuz"];
+    var body = '<div class="choices">';
+    pairs.forEach(function (p, i) {
+      body += '<div class="pair"><b>' + p[0] + '</b><select id="s' + i + '" aria-label="' + p[0] + ' qaysi tilda"><option value="">Tilni tanla</option>' +
+        langs.map(function (l) { return '<option>' + l + '</option>'; }).join("") + '</select></div>';
+    });
+    body += '</div><div class="row"><button class="primary" id="chk">Tekshirish</button></div>';
+    frame(3, "Tillar", "Bu jumlalarning hammasi “Seni sevaman” degani. Qaysi tilda?", "Har bir jumlaga mos tilni tanla.", body,
+      "Rus tili osongina topiladi, qolganini internetdan taqqoslab ko‘rsang bo‘ladi.", "https://translate.google.com/?sl=auto&tl=uz&text=I%20love%20you");
+    q("chk").onclick = function () {
+      var ok = pairs.every(function (p, i) { return q("s" + i).value === p[1]; });
+      if (ok) good("Barakalla, to‘rttalasi ham to‘g‘ri.", r4); else bad("Kamida bittasi noto‘g‘ri, yana bir ko‘r.");
+    };
+  }
+
+  // 4. Number code (A=1 ... Z=26)
+  function r4() {
+    frame(4, "Shifr", "Raqamlarni harfga aylantir.", "Ingliz alifbosida har bir harfning o‘z tartib raqami bor (A=1, B=2 ...). Quyidagi raqamlar qaysi so‘zni yashiradi?",
+      '<div class="code">19 · 5 · 22 · 7 · 9</div><input type="text" id="ans" maxlength="12" autocomplete="off" aria-label="Javob"><div class="row"><button class="primary" id="chk">Tekshirish</button></div>',
+      "Beshta raqam, beshta harf. Natija bu sahifadagi eng asosiy tuyg‘u.", "https://www.google.com/search?q=alphabet+letters+numbers+A%3D1");
+    function go() { if (norm(q("ans").value) === "sevgi") good("To‘g‘ri, SEVGI.", r5); else bad("Hali emas, raqamlarni harfga sekin aylantirib chiq."); }
+    q("chk").onclick = go;
+    q("ans").onkeydown = function (e) { if (e.key === "Enter") go(); };
+  }
+
+  // 5. Morse in Spanish, translate to Uzbek
+  function r5() {
+    frame(5, "Oxirgi jumboq", "Bu xabar Morze alifbosida yozilgan.", "Avval uni o‘qi, u ispan tilida. Keyin o‘zbekchaga tarjima qilib yoz.",
+      '<div class="code">- .&nbsp;&nbsp;/&nbsp;&nbsp;.- -- ---</div><input type="text" id="ans" maxlength="40" autocomplete="off" aria-label="O‘zbekcha tarjima"><div class="row"><button class="primary" id="chk">Tekshirish</button></div>',
+      "Nuqta qisqa, chiziq uzun signal. Chiziq (/) so‘zlarni ajratadi. Ispancha ikki so‘z, ikkinchisi “amo” bilan boshlanadi.", "https://www.google.com/search?q=morse+code+alphabet");
+    var ok = ["seni sevaman", "men seni sevaman", "sevaman seni", "sevaman"];
+    function go() { if (ok.indexOf(norm(q("ans").value)) !== -1) good("Hammasi to‘g‘ri.", finale); else bad("Yaqin qoldin. Morzedan o‘qigan so‘zingni internetda tarjima qilib ko‘r."); }
+    q("chk").onclick = go;
+    q("ans").onkeydown = function (e) { if (e.key === "Enter") go(); };
+  }
+
+  function finale() {
+    setDots(4);
+    stage.innerHTML =
+      '<div class="letter">' +
+      '<svg class="heart" viewBox="0 0 24 24" aria-hidden="true"><path fill="var(--accent)" d="M12 21.5C5 16 2 12.5 2 8.8 2 6 4.2 4 6.8 4c1.9 0 3.600 1 5.200 3C13.600 5 15.300 4 17.200 4 19.800 4 22 6 22 8.800c0 3.700-3 7.200-10 12.700z"/></svg>' +
+      '<div class="big">' + NAME + ', seni juda sevaman</div>' +
+      '<div>Masofa qancha uzoq bo‘lmasin, yuragim doim sening yoningda.</div>' +
+      '<div>Sen bilan bo‘lgan har bir kun menga eng yaxshi sovg‘a.</div>' +
+      '</div>' +
+      '<div class="row"><button class="primary" id="ans">Javobim shu</button></div>' +
+      '<div class="reply" id="reply"></div>';
+    q("ans").onclick = function () {
+      q("reply").textContent = "Endi javobingni menga yoz. Kutaman.";
+      this.hidden = true;
+    };
+  }
+
+  intro();
+})();
+</script>
+
+</html>
